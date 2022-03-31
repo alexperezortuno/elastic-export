@@ -1,3 +1,4 @@
+import pandas as pd
 from datetime import datetime
 from elasticsearch import Elasticsearch
 from elasticsearch_dsl import Search, Q
@@ -31,18 +32,28 @@ def info(es: Elasticsearch):
         return None
 
 
-def search(es: Elasticsearch, index: str, gte: str = None, lte: str = None, from_: int = 0, size: int = 10, scroll: str = '1m', scroll_id: str = None, sort: List[str] = None):
+def search(es: Elasticsearch,
+           index: str,
+           gte: str = None,
+           lte: str = None,
+           size: int = 10,
+           query: str = None,
+           scroll: str = '1m',
+           scroll_id: str = None,
+           file_name: str = None,
+           sort: List[str] = None):
     """
     Search for documents in Elasticsearch.
-    :param es:
-    :param index:
-    :param gte:
-    :param lte:
-    :param from_:
-    :param size:
-    :param scroll:
-    :param scroll_id:
-    :param sort:
+    :param es: string
+    :param index: string
+    :param gte: string
+    :param lte: string
+    :param size: int
+    :param query: string
+    :param scroll: string
+    :param scroll_id: string
+    :param file_name: string
+    :param sort: List[str]
     :return:
     """
     try:
@@ -59,25 +70,38 @@ def search(es: Elasticsearch, index: str, gte: str = None, lte: str = None, from
               })
 
         q = Q('bool', must=[
-            Q('match', **{'08_AccessRouteName': 'TESTE-MASSIVO-MKT'}),
-            Q('match', **{'39_CallingPartyCountry': '55'})
+            # Q('match', **{'08_AccessRouteName': 'TESTE-MASSIVO-MKT'}),
+            # Q('match', **{'39_CallingPartyCountry': '55'})
         ], filter=[f])
 
         body: dict = {
+            'size': size,
             'query': q.to_dict(),
         }
 
+        if query is not None:
+            body.get('query').get('bool')['must'] = [{'query_string': {'query': query}}]
+
         # res = Search(using=es, index=index, scroll='1m').query(q).extra(from_=from_, size=10).filter(f)
+        logger.debug(f"{body}")
         if scroll_id is None:
             response = es.search(index=index, body=body, size=size, sort=sort, scroll=scroll)
         else:
             response = es.scroll(scroll=scroll, scroll_id=scroll_id)
-        # logger.debug(f"{response.get('hits').get('hits')}")
-        # logger.debug(f"{response.get('hits').get('total').get('value')}")
+
         # logger.debug(f"{response.get('_scroll_id')}")
         # response = res.execute()
         if len(response.get('hits').get('hits')) > 0:
-            return search(es, index, gte, lte, from_ + size, size, scroll, response.get('_scroll_id'))
+            l: List = response.get('hits').get('hits')
+            data_list: List = []
+
+            for i in l:
+                data_list.append(i['_source'].values())
+
+            data = pd.DataFrame(data_list, columns=i['_source'].keys())
+            data.to_csv(file_name, mode='a', header=False, index=False)
+
+            return search(es, index, gte, lte, size, query, scroll, response.get('_scroll_id'), file_name, sort)
 
         return response
     except Exception as e:
