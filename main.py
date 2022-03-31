@@ -15,7 +15,7 @@ if __name__ == "__main__":
         less_than: str = None
         query: str = ""
         es: Elasticsearch = None
-        query_string: str = None
+        query_string: str = ELASTIC_QUERY_STRING
         query_type: str = None
         file_output_name: str = FILE_OUTPUT_NAME
         file_format: str = FILE_FORMAT
