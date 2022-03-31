@@ -16,5 +16,6 @@ LOG_FORMAT: str = os.environ.get('LOG_FORMAT', '%(asctime)s - %(name)s - %(level
 LOG_LEVEL: str = os.environ.get('LOG_LEVEL', 'INFO')
 FILE_OUTPUT_NAME: str = os.environ.get('FILE_OUTPUT_NAME', 'output')
 FILE_FORMAT: str = os.environ.get('FILE_FORMAT', 'csv')
+FILE_OUTPUT_PATH: str = os.environ.get('FILE_OUTPUT_PATH', './')
 QUERY: str = os.environ.get('QUERY', '*')
 SCROLL_SIZE: str = os.environ.get('SCROLL_SIZE', '1m')

@@ -21,9 +21,10 @@ if __name__ == "__main__":
         file_format: str = FILE_FORMAT
         scroll_size: int = SCROLL_SIZE
         file: str = None
+        output_path: str = FILE_OUTPUT_PATH
 
         opts, args = getopt.getopt(sys.argv[1:],
-                                   "hu:p:i:g:l:q:t:o:f:s:",
+                                   "hu:p:i:g:l:q:t:o:f:s:d:",
                                    ["help",
                                     "url",
                                     "port",
@@ -34,7 +35,9 @@ if __name__ == "__main__":
                                     "type",
                                     "output",
                                     "format",
-                                    "scroll"])
+                                    "scroll",
+                                    "output_path",
+                                    ])
 
         for opt, arg in opts:
             if opt in ("-h", "--help"):
@@ -60,10 +63,12 @@ if __name__ == "__main__":
                 less_than = arg
             elif opt in ("-s", "--scroll"):
                 scroll_size = int(arg)
+            elif opt in ("-d", "--output_path"):
+                output_path = arg
 
         es = connect([f"{ELASTIC_SCHEME}://{ELASTIC_URL}:{ELASTIC_PORT}"])
 
-        file = create_if_not_exist(f'{file_output_name}.{file_format}')
+        file = create_if_not_exist(f'{file_output_name}.{file_format}', output_path)
 
         if es is None:
             raise Exception("Elasticsearch not connected")
