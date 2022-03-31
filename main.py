@@ -11,8 +11,8 @@ from settings import *
 
 if __name__ == "__main__":
     try:
-        greater_than: str = None
-        less_than: str = None
+        greater_than: str = QUERY_GREATER_THAN
+        less_than: str = QUERY_LESS_THAN
         query: str = ""
         es: Elasticsearch = None
         query_string: str = ELASTIC_QUERY_STRING
