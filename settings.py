@@ -1,7 +1,12 @@
 import ast
 import os
+from os.path import join, dirname
+from dotenv import load_dotenv
 
-ELASTIC_URL: str = os.environ.get('ELASTIC_URL', 'http://localhost')
+dotenv_path = join(dirname(__file__), '.env')
+load_dotenv(dotenv_path)
+
+ELASTIC_URL: str = os.environ.get('ELASTIC_URL', 'localhost')
 ELASTIC_PORT: int = ast.literal_eval(os.environ.get('ELASTIC_PORT', '9200'))
 ELASTIC_SCHEME: str = os.environ.get('ELASTIC_SCHEME', 'http')
 ELASTIC_INDEX: str = os.environ.get('ELASTIC_INDEX', 'test')

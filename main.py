@@ -6,7 +6,8 @@ from elasticsearch import Elasticsearch
 from core.log import logger
 from core.elastic import connect, info, search
 from core.tools import create_if_not_exist
-from globals import parameters, documentation
+from globals import documentation
+from settings import *
 
 if __name__ == "__main__":
     try:
@@ -16,9 +17,9 @@ if __name__ == "__main__":
         es: Elasticsearch = None
         query_string: str = None
         query_type: str = None
-        file_output_name: str = parameters.FILE_OUTPUT_NAME
-        file_format: str = parameters.FILE_FORMAT
-        scroll_size: int = parameters.SCROLL_SIZE
+        file_output_name: str = FILE_OUTPUT_NAME
+        file_format: str = FILE_FORMAT
+        scroll_size: int = SCROLL_SIZE
         file: str = None
 
         opts, args = getopt.getopt(sys.argv[1:],
@@ -40,11 +41,11 @@ if __name__ == "__main__":
                 print(documentation.doc_help())
                 sys.exit(0)
             elif opt in ("-p", "--port"):
-                parameters.ELASTIC_PORT = arg
+                ELASTIC_PORT = arg
             elif opt in ("-i", "--index"):
-                parameters.ELASTIC_INDEX = arg
+                ELASTIC_INDEX = arg
             elif opt in ("-host", "--host"):
-                parameters.ELASTIC_URL = arg
+                ELASTIC_URL = arg
             elif opt in ("-q", "--query"):
                 query_string = arg
             elif opt in ("-t", "--type"):
@@ -60,11 +61,7 @@ if __name__ == "__main__":
             elif opt in ("-s", "--scroll"):
                 scroll_size = int(arg)
 
-        logger.debug(parameters.ELASTIC_URL)
-        logger.debug(parameters.ELASTIC_PORT)
-        logger.debug(parameters.ELASTIC_INDEX)
-
-        es = connect([f"{parameters.ELASTIC_SCHEME}://{parameters.ELASTIC_URL}:{parameters.ELASTIC_PORT}"])
+        es = connect([f"{ELASTIC_SCHEME}://{ELASTIC_URL}:{ELASTIC_PORT}"])
 
         file = create_if_not_exist(f'{file_output_name}.{file_format}')
 
@@ -82,16 +79,19 @@ if __name__ == "__main__":
                     logger.debug(f"{res}" + "\n")
             else:
                 res = search(es,
-                             parameters.ELASTIC_INDEX,
+                             ELASTIC_INDEX,
                              greater_than,
                              less_than,
-                             parameters.MAX_SIZE,
+                             MAX_SIZE,
                              query_string,
                              scroll_size,
                              None,
                              file,
                              )
                 logger.debug(f"{res}" + "\n")
+        sys.exit(0)
+    except KeyboardInterrupt:
+        logger.info("Program interrupted by user... Exiting")
         sys.exit(0)
     except Exception as e:
         logger.error("{0}".format(e))

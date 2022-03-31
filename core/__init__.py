@@ -1,5 +1,5 @@
-from pathlib import Path
+from os.path import join, dirname
 from dotenv import load_dotenv
 
-env_path = Path('.') / '.env'
-load_dotenv(dotenv_path=env_path)
+dotenv_path = join(dirname(__file__), '.env')
+load_dotenv(dotenv_path)

@@ -1,5 +1,5 @@
 import logging
-from globals.parameters import LOG_LEVEL, LOG_FORMAT
+from settings import LOG_LEVEL, LOG_FORMAT
 
 import coloredlogs
 
