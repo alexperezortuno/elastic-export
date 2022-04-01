@@ -47,7 +47,7 @@ if __name__ == "__main__":
                 ELASTIC_PORT = arg
             elif opt in ("-i", "--index"):
                 ELASTIC_INDEX = arg
-            elif opt in ("-host", "--host"):
+            elif opt in ("-u", "--url", "-host", "--host"):
                 ELASTIC_URL = arg
             elif opt in ("-q", "--query"):
                 query_string = arg
