@@ -83,7 +83,7 @@ def search(es: Elasticsearch,
             body.get('query').get('bool')['must'] = [{'query_string': {'query': query}}]
 
         # res = Search(using=es, index=index, scroll='1m').query(q).extra(from_=from_, size=10).filter(f)
-        logger.debug(f"{body}")
+
         if scroll_id is None:
             response = es.search(index=index, body=body, size=size, sort=sort, scroll=scroll)
         else:

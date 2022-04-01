@@ -6,23 +6,25 @@ from elasticsearch import Elasticsearch
 from core.log import logger
 from core.elastic import connect, info, search
 from core.tools import create_if_not_exist
-from globals import parameters, documentation
+from globals import documentation
+from settings import *
 
 if __name__ == "__main__":
     try:
-        greater_than: str = None
-        less_than: str = None
+        greater_than: str = QUERY_GREATER_THAN
+        less_than: str = QUERY_LESS_THAN
         query: str = ""
         es: Elasticsearch = None
-        query_string: str = None
+        query_string: str = ELASTIC_QUERY_STRING
         query_type: str = None
-        file_output_name: str = parameters.FILE_OUTPUT_NAME
-        file_format: str = parameters.FILE_FORMAT
-        scroll_size: int = parameters.SCROLL_SIZE
+        file_output_name: str = FILE_OUTPUT_NAME
+        file_format: str = FILE_FORMAT
+        scroll_size: int = SCROLL_SIZE
         file: str = None
+        output_path: str = FILE_OUTPUT_PATH
 
         opts, args = getopt.getopt(sys.argv[1:],
-                                   "hu:p:i:g:l:q:t:o:f:s:",
+                                   "hu:p:i:g:l:q:t:o:f:s:d:",
                                    ["help",
                                     "url",
                                     "port",
@@ -33,18 +35,20 @@ if __name__ == "__main__":
                                     "type",
                                     "output",
                                     "format",
-                                    "scroll"])
+                                    "scroll",
+                                    "output_path",
+                                    ])
 
         for opt, arg in opts:
             if opt in ("-h", "--help"):
                 print(documentation.doc_help())
                 sys.exit(0)
             elif opt in ("-p", "--port"):
-                parameters.ELASTIC_PORT = arg
+                ELASTIC_PORT = arg
             elif opt in ("-i", "--index"):
-                parameters.ELASTIC_INDEX = arg
-            elif opt in ("-host", "--host"):
-                parameters.ELASTIC_URL = arg
+                ELASTIC_INDEX = arg
+            elif opt in ("-u", "--url", "-host", "--host"):
+                ELASTIC_URL = arg
             elif opt in ("-q", "--query"):
                 query_string = arg
             elif opt in ("-t", "--type"):
@@ -59,14 +63,12 @@ if __name__ == "__main__":
                 less_than = arg
             elif opt in ("-s", "--scroll"):
                 scroll_size = int(arg)
+            elif opt in ("-d", "--output_path"):
+                output_path = arg
 
-        logger.debug(parameters.ELASTIC_URL)
-        logger.debug(parameters.ELASTIC_PORT)
-        logger.debug(parameters.ELASTIC_INDEX)
+        es = connect([f"{ELASTIC_SCHEME}://{ELASTIC_URL}:{ELASTIC_PORT}"])
 
-        es = connect([f"{parameters.ELASTIC_SCHEME}://{parameters.ELASTIC_URL}:{parameters.ELASTIC_PORT}"])
-
-        file = create_if_not_exist(f'{file_output_name}.{file_format}')
+        file = create_if_not_exist(f'{file_output_name}.{file_format}', output_path)
 
         if es is None:
             raise Exception("Elasticsearch not connected")
@@ -82,16 +84,19 @@ if __name__ == "__main__":
                     logger.debug(f"{res}" + "\n")
             else:
                 res = search(es,
-                             parameters.ELASTIC_INDEX,
+                             ELASTIC_INDEX,
                              greater_than,
                              less_than,
-                             parameters.MAX_SIZE,
+                             MAX_SIZE,
                              query_string,
                              scroll_size,
                              None,
                              file,
                              )
                 logger.debug(f"{res}" + "\n")
+        sys.exit(0)
+    except KeyboardInterrupt:
+        logger.info("Program interrupted by user... Exiting")
         sys.exit(0)
     except Exception as e:
         logger.error("{0}".format(e))
