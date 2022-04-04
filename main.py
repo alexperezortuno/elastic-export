@@ -25,9 +25,10 @@ if __name__ == "__main__":
         output_path: str = FILE_OUTPUT_PATH
         headers: bool = False
         showquery: bool = False
+        max_size: int = MAX_SIZE
 
         opts, args = getopt.getopt(sys.argv[1:],
-                                   "hu:p:i:g:l:qs:q:t:o:f:s:d:c:show:",
+                                   "hu:p:i:g:l:qs:q:t:o:f:s:d:c:show:m:",
                                    ["help=",
                                     "url=",
                                     "port=",
@@ -42,7 +43,8 @@ if __name__ == "__main__":
                                     "scroll=",
                                     "output_path=",
                                     "columns=",
-                                    "showquery="
+                                    "showquery=",
+                                    "max_size=",
                                     ])
 
         for opt, arg in opts:
@@ -71,6 +73,8 @@ if __name__ == "__main__":
                 less_than = arg
             elif opt in ("-s", "--scroll"):
                 scroll_size = int(arg)
+            elif opt in ("-m", "--max_size"):
+                max_size = int(arg)
             elif opt in ("-d", "--output_path"):
                 output_path = arg
             elif opt in ("-c", "--columns"):
@@ -83,6 +87,8 @@ if __name__ == "__main__":
 
         if es is None:
             raise Exception("Elasticsearch not connected")
+
+        file = create_if_not_exist(f'{file_output_name}.{file_format}', output_path)
 
         if query_string is None:
             query_string = {"match_all": {}}
@@ -98,7 +104,7 @@ if __name__ == "__main__":
                              ELASTIC_INDEX,
                              greater_than,
                              less_than,
-                             MAX_SIZE,
+                             max_size,
                              query,
                              query_string,
                              scroll_size,
