@@ -41,6 +41,7 @@ def search(es: Elasticsearch,
            scroll: str = '1m',
            scroll_id: str = None,
            file_name: str = None,
+           headers: bool = False,
            sort: List[str] = None):
     """
     Search for documents in Elasticsearch.
@@ -53,6 +54,7 @@ def search(es: Elasticsearch,
     :param scroll: string
     :param scroll_id: string
     :param file_name: string
+    :param headers: bool
     :param sort: List[str]
     :return:
     """
@@ -99,9 +101,9 @@ def search(es: Elasticsearch,
                 data_list.append(i['_source'].values())
 
             data = pd.DataFrame(data_list, columns=i['_source'].keys())
-            data.to_csv(file_name, mode='a', header=False, index=False)
+            data.to_csv(file_name, mode='a', header=headers, index=False)
 
-            return search(es, index, gte, lte, size, query, scroll, response.get('_scroll_id'), file_name, sort)
+            return search(es, index, gte, lte, size, query, scroll, response.get('_scroll_id'), file_name, False, sort)
 
         return response
     except Exception as e:

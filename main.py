@@ -22,9 +22,10 @@ if __name__ == "__main__":
         scroll_size: int = SCROLL_SIZE
         file: str = None
         output_path: str = FILE_OUTPUT_PATH
+        headers: bool = False
 
         opts, args = getopt.getopt(sys.argv[1:],
-                                   "hu:p:i:g:l:q:t:o:f:s:d:",
+                                   "hu:p:i:g:l:q:t:o:f:s:d:c:",
                                    ["help",
                                     "url",
                                     "port",
@@ -37,6 +38,7 @@ if __name__ == "__main__":
                                     "format",
                                     "scroll",
                                     "output_path",
+                                    "columns=",
                                     ])
 
         for opt, arg in opts:
@@ -65,6 +67,8 @@ if __name__ == "__main__":
                 scroll_size = int(arg)
             elif opt in ("-d", "--output_path"):
                 output_path = arg
+            elif opt in ("-c", "--columns"):
+                headers = arg.lower() in ['true', '1', 't', 'y', 'yes', 'yeah', 'yup', 'certainly', 'uh-huh']
 
         es = connect([f"{ELASTIC_SCHEME}://{ELASTIC_URL}:{ELASTIC_PORT}"])
 
@@ -92,6 +96,7 @@ if __name__ == "__main__":
                              scroll_size,
                              None,
                              file,
+                             headers,
                              )
                 logger.debug(f"{res}" + "\n")
         sys.exit(0)
