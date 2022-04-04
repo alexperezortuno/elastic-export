@@ -1,8 +1,9 @@
 import pandas as pd
+import json
 from datetime import datetime
 from elasticsearch import Elasticsearch
 from elasticsearch_dsl import Search, Q
-from typing import List
+from typing import List, Optional
 from core.log import logger
 
 
@@ -38,11 +39,13 @@ def search(es: Elasticsearch,
            lte: str = None,
            size: int = 10,
            query: str = None,
+           query_string: str = None,
            scroll: str = '1m',
            scroll_id: str = None,
            file_name: str = None,
            headers: bool = False,
-           sort: List[str] = None):
+           sort: List[str] = None,
+           showquery:bool = False) -> Optional[pd.DataFrame]:
     """
     Search for documents in Elasticsearch.
     :param es: string
@@ -51,16 +54,19 @@ def search(es: Elasticsearch,
     :param lte: string
     :param size: int
     :param query: string
+    :param query_string: string
     :param scroll: string
     :param scroll_id: string
     :param file_name: string
     :param headers: bool
     :param sort: List[str]
+    :param rawquery: bool
     :return:
     """
     try:
         date_gte = datetime.strptime(gte, "%Y-%m-%dT%H:%M:%S") if gte else None
         date_lte = datetime.strptime(lte, "%Y-%m-%dT%H:%M:%S") if lte else None
+        must = []
 
         f = Q('range',
               **{'@timestamp':
@@ -71,10 +77,7 @@ def search(es: Elasticsearch,
                   }
               })
 
-        q = Q('bool', must=[
-            # Q('match', **{'08_AccessRouteName': 'TESTE-MASSIVO-MKT'}),
-            # Q('match', **{'39_CallingPartyCountry': '55'})
-        ], filter=[f])
+        q = Q('bool', must=must, filter=[f])
 
         body: dict = {
             'size': size,
@@ -82,17 +85,25 @@ def search(es: Elasticsearch,
         }
 
         if query is not None:
-            body.get('query').get('bool')['must'] = [{'query_string': {'query': query}}]
+            body.get('query').get('bool')['must'] = [{'query_string': {'query': query_string}}]
 
-        # res = Search(using=es, index=index, scroll='1m').query(q).extra(from_=from_, size=10).filter(f)
+        if query is not None:
+            q = query.split(',')
+            for i in q:
+                must_string = i.split('=')
+                # body.get('query').get('bool')['must'].append(Q('match', **{must_string[0]: must_string[1]}))
+
+        if showquery:
+            print(json.dumps(body, indent = 4))
+            # with open(file_name, 'w', encoding='utf-8') as f:
+            #     json.dump(body, f, ensure_ascii=False, indent=4)
+            return None
 
         if scroll_id is None:
             response = es.search(index=index, body=body, size=size, sort=sort, scroll=scroll)
         else:
             response = es.scroll(scroll=scroll, scroll_id=scroll_id)
 
-        # logger.debug(f"{response.get('_scroll_id')}")
-        # response = res.execute()
         if len(response.get('hits').get('hits')) > 0:
             l: List = response.get('hits').get('hits')
             data_list: List = []
@@ -103,7 +114,19 @@ def search(es: Elasticsearch,
             data = pd.DataFrame(data_list, columns=i['_source'].keys())
             data.to_csv(file_name, mode='a', header=headers, index=False)
 
-            return search(es, index, gte, lte, size, query, scroll, response.get('_scroll_id'), file_name, False, sort)
+            return search(es,
+                          index,
+                          gte,
+                          lte,
+                          size,
+                          query,
+                          query_string,
+                          scroll,
+                          response.get('_scroll_id'),
+                          file_name,
+                          False,
+                          sort,
+                          showquery)
 
         return response
     except Exception as e:

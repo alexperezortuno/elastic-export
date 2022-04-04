@@ -16,6 +16,7 @@ if __name__ == "__main__":
         query: str = ""
         es: Elasticsearch = None
         query_string: str = ELASTIC_QUERY_STRING
+        query: str = ELASTIC_QUERY
         query_type: str = None
         file_output_name: str = FILE_OUTPUT_NAME
         file_format: str = FILE_FORMAT
@@ -23,22 +24,25 @@ if __name__ == "__main__":
         file: str = None
         output_path: str = FILE_OUTPUT_PATH
         headers: bool = False
+        showquery: bool = False
 
         opts, args = getopt.getopt(sys.argv[1:],
-                                   "hu:p:i:g:l:q:t:o:f:s:d:c:",
-                                   ["help",
-                                    "url",
-                                    "port",
-                                    "index",
-                                    "greater_than",
-                                    "less_than",
-                                    "query",
-                                    "type",
-                                    "output",
-                                    "format",
-                                    "scroll",
-                                    "output_path",
+                                   "hu:p:i:g:l:qs:q:t:o:f:s:d:c:show:",
+                                   ["help=",
+                                    "url=",
+                                    "port=",
+                                    "index=",
+                                    "greater_than=",
+                                    "less_than=",
+                                    "query_string=",
+                                    "query=",
+                                    "type=",
+                                    "output=",
+                                    "format=",
+                                    "scroll=",
+                                    "output_path=",
                                     "columns=",
+                                    "showquery="
                                     ])
 
         for opt, arg in opts:
@@ -51,8 +55,10 @@ if __name__ == "__main__":
                 ELASTIC_INDEX = arg
             elif opt in ("-u", "--url", "-host", "--host"):
                 ELASTIC_URL = arg
-            elif opt in ("-q", "--query"):
+            elif opt  == "-qs" or opt == "--query_string":
                 query_string = arg
+            elif opt == "-q" or opt == "--query":
+                query = arg
             elif opt in ("-t", "--type"):
                 query_type = arg
             elif opt in ("-o", "--output"):
@@ -69,10 +75,11 @@ if __name__ == "__main__":
                 output_path = arg
             elif opt in ("-c", "--columns"):
                 headers = arg.lower() in ['true', '1', 't', 'y', 'yes', 'yeah', 'yup', 'certainly', 'uh-huh']
+            elif opt == "--showquery":
+                showquery = arg.lower() in ['true', '1', 't', 'y', 'yes', 'yeah', 'yup', 'certainly', 'uh-huh']
 
         es = connect([f"{ELASTIC_SCHEME}://{ELASTIC_URL}:{ELASTIC_PORT}"])
-
-        file = create_if_not_exist(f'{file_output_name}.{file_format}', output_path)
+        logger.debug(f"Parameters {query_string}:{query}:{query_type}:{file_output_name}:{file_format}:{scroll_size}:{output_path}:{headers}:{showquery}")
 
         if es is None:
             raise Exception("Elasticsearch not connected")
@@ -92,12 +99,14 @@ if __name__ == "__main__":
                              greater_than,
                              less_than,
                              MAX_SIZE,
+                             query,
                              query_string,
                              scroll_size,
                              None,
                              file,
                              headers,
-                             )
+                             None,
+                             showquery)
                 logger.debug(f"{res}" + "\n")
         sys.exit(0)
     except KeyboardInterrupt:
