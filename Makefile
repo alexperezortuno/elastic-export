@@ -2,7 +2,7 @@ run: compile clean
 
 .PHONY: compile
 compile:
-	pyinstaller -F --clean --noconfirm -n pylastic_report main.py
+	pyinstaller --onefile -F --clean --noconfirm -n pylastic_report main.py
 
 .PHONY: clean
 clean:
