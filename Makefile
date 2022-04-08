@@ -1,8 +1,12 @@
-run: compile clean
+run: compile
 
 .PHONY: compile
 compile:
-	pyinstaller --onefile -F --clean --noconfirm -n pylastic_report main.py
+	./build.sh
+
+.PHONY: venv
+venv:
+	source bin/activate
 
 .PHONY: clean
 clean:
