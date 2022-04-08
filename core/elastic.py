@@ -38,14 +38,14 @@ def search(es: Elasticsearch,
            gte: str = None,
            lte: str = None,
            size: int = 10,
-           query: str = None,
-           query_string: str = None,
+           query: str = '',
+           query_string: str = '',
            scroll: str = '1m',
            scroll_id: str = None,
            file_name: str = None,
            headers: bool = False,
            sort: List[str] = None,
-           showquery:bool = False) -> Optional[pd.DataFrame]:
+           showquery: bool = False) -> Optional[pd.DataFrame]:
     """
     Search for documents in Elasticsearch.
     :param es: string
@@ -60,7 +60,7 @@ def search(es: Elasticsearch,
     :param file_name: string
     :param headers: bool
     :param sort: List[str]
-    :param rawquery: bool
+    :param showquery: bool
     :return:
     """
     try:
@@ -84,17 +84,17 @@ def search(es: Elasticsearch,
             'query': q.to_dict(),
         }
 
-        if query is not None:
+        if query_string != '':
             body.get('query').get('bool')['must'] = [{'query_string': {'query': query_string}}]
 
-        if query is not None:
+        if query != '':
             q = query.split(',')
             for i in q:
                 must_string = i.split('=')
                 # body.get('query').get('bool')['must'].append(Q('match', **{must_string[0]: must_string[1]}))
 
         if showquery:
-            print(json.dumps(body, indent = 4))
+            print(json.dumps(body, indent=4))
             # with open(file_name, 'w', encoding='utf-8') as f:
             #     json.dump(body, f, ensure_ascii=False, indent=4)
             return None
