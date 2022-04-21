@@ -1,5 +1,10 @@
 # pylastic-report
 
+| Flag | Default | Description |
+|---|---| --- |
+| -h or --help |   | Show this help message and exit. |
+| -u or --h | | |
+
 ###Example commands to run:
 
 ````shell

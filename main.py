@@ -31,9 +31,10 @@ if __name__ == "__main__":
         elastic_url: str = ELASTIC_URL
         elastic_port: int = ELASTIC_PORT
         elastic_index: str = ELASTIC_INDEX
+        rawquery: str = ''
 
         opts, args = getopt.getopt(sys.argv[1:],
-                                   "hu:p:i:g:l:qs:q:t:o:f:s:d:c:show:m:",
+                                   "hu:p:i:g:l:qs:q:t:o:f:s:d:c:show:m:r:",
                                    ["help=",
                                     "url=",
                                     "port=",
@@ -50,42 +51,45 @@ if __name__ == "__main__":
                                     "columns=",
                                     "showquery=",
                                     "max_size=",
+                                    "rawquery="
                                     ])
 
         for opt, arg in opts:
-            if opt in ("-h", "--help"):
+            if opt == "-h" or opt == "--help":
                 print(documentation.doc_help())
                 sys.exit(0)
-            if opt in ("-p", "--port"):
+            if opt == "-p" or opt == "--port":
                 elastic_port = arg
             if opt == "-i" or opt == "--index":
                 elastic_index = arg
-            if opt in ("-u", "--url", "-host", "--host"):
+            if opt == "-u" or opt == "--url" or opt == "-host" or opt == "--host":
                 elastic_url = arg
             if opt == "--query_string":
                 query_string = arg
             if opt == "-q" or opt == "--query":
                 query = arg
-            if opt in ("-t", "--type"):
+            if opt == "-t" or opt == "--type":
                 query_type = arg
-            if opt in ("-o", "--output"):
+            if opt == "-o" or opt == "--output":
                 file_output_name = arg
-            if opt in ("-f", "--format"):
+            if opt == "-f" or opt == "--format":
                 file_format = arg
-            if opt in ("-g", "--greater_than"):
+            if opt == "-g" or opt == "--greater_than":
                 greater_than = arg
-            if opt in ("-l", "--less_than"):
+            if opt == "-l" or opt == "--less_than":
                 less_than = arg
             if opt == "--scroll":
                 scroll_str = arg
-            if opt in ("-m", "--max_size"):
+            if opt == "-m" or opt == "--max_size":
                 max_size = int(arg)
-            if opt in ("-d", "--output_path"):
+            if opt == "-d" or opt == "--output_path":
                 output_path = arg
-            if opt in ("-c", "--columns"):
+            if opt == "-c" or opt == "--columns":
                 headers = arg.lower() in ['true', '1', 't', 'y', 'yes', 'yeah', 'yup', 'certainly', 'uh-huh']
             if opt == "--showquery":
                 showquery = arg.lower() in ['true', '1', 't', 'y', 'yes', 'yeah', 'yup', 'certainly', 'uh-huh']
+            if opt == "--rawquery":
+                rawquery = arg
 
         es = connect([f"{elastic_scheme}://{elastic_url}:{elastic_port}"])
         logger.debug(
@@ -118,7 +122,8 @@ if __name__ == "__main__":
                              file,
                              headers,
                              None,
-                             showquery)
+                             showquery,
+                             rawquery)
                 logger.debug(f"{res}" + "\n")
         sys.exit(0)
     except KeyboardInterrupt:

@@ -1,5 +1,6 @@
 import pandas as pd
 import json
+from urllib.parse import unquote
 from datetime import datetime
 from elasticsearch import Elasticsearch
 from elasticsearch_dsl import Search, Q
@@ -45,7 +46,8 @@ def search(es: Elasticsearch,
            file_name: str = None,
            headers: bool = False,
            sort: List[str] = None,
-           showquery: bool = False) -> Optional[pd.DataFrame]:
+           showquery: bool = False,
+           rawquery: str = '') -> Optional[pd.DataFrame]:
     """
     Search for documents in Elasticsearch.
     :param es: string
@@ -93,6 +95,9 @@ def search(es: Elasticsearch,
                 must_string = i.split('=')
                 # body.get('query').get('bool')['must'].append(Q('match', **{must_string[0]: must_string[1]}))
 
+        if rawquery != '':
+            body['query'] = json.loads(unquote(rawquery))
+
         if showquery:
             print(json.dumps(body, indent=4))
             # with open(file_name, 'w', encoding='utf-8') as f:
@@ -126,7 +131,8 @@ def search(es: Elasticsearch,
                           file_name,
                           False,
                           sort,
-                          showquery)
+                          showquery,
+                          rawquery)
 
         return response
     except Exception as e:
