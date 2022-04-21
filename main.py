@@ -1,6 +1,4 @@
-import os
 import sys, getopt
-from typing import Any
 
 from elasticsearch import Elasticsearch
 from core.log import logger
@@ -99,9 +97,6 @@ if __name__ == "__main__":
             raise Exception("Elasticsearch not connected")
 
         file = create_if_not_exist(f'{file_output_name}.{file_format}', output_path)
-
-        # if query == '':
-        #     query_string = {"match_all": {}}
 
         if es is not None:
             logger.debug(es)
