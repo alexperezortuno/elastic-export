@@ -2,7 +2,6 @@ altgraph==0.17.2
 astroid==2.11.2
 certifi==2021.10.8
 coloredlogs==15.0.1
-dataclasses==0.8
 dill==0.3.4
 elastic-transport==8.1.1
 elasticsearch==7.17.2
