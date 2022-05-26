@@ -50,3 +50,9 @@ update the packages:
 ````shell
 pip install pip-upgrader
 ````
+
+remove packages:
+
+```shell
+pip freeze > unins && pip uninstall -y -r unins && rm unins
+```
