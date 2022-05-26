@@ -110,7 +110,7 @@ def search(es: Elasticsearch,
               **{'@timestamp':
                   {
                       'gte': date_gte.strftime('%Y-%m-%d %H:%M:%S'),
-                      'lt': date_lte.strftime('%Y-%m-%d %H:%M:%S'),
+                      'lte': date_lte.strftime('%Y-%m-%d %H:%M:%S'),
                       'format': 'yyyy-MM-dd HH:mm:ss||yyyy-MM-dd||epoch_millis'
                   }
               })
@@ -151,6 +151,7 @@ def search(es: Elasticsearch,
 
         if len(response.get('hits').get('hits')) > 0:
             if parameters.max_size is not None and parameters.max_size <= int(get_size(parameters.file, 'MB')):
+                logger.debug(f"File size is {get_size(parameters.file, 'MB')} MB. Max size is {parameters.max_size} MB.")
                 return None
 
             l: List = response.get('hits').get('hits')

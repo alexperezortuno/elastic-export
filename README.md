@@ -24,3 +24,29 @@ pyinstaller -F --clean --noconfirm -n pylastic_report main.py
 ````
 
 and copy the binary to the /usr/bin folder.
+
+### Prerequisites:
+
+Need bz2 for installation.
+
+Ubuntu/Debian:
+
+```shell
+sudo apt-get install libbz2-dev
+```
+
+````shell
+yum install bzip2-devel
+````
+
+### Check oudated list of packages
+
+````shell
+pip list --outdated
+````
+
+update the packages:
+
+````shell
+pip install pip-upgrader
+````

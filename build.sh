@@ -7,7 +7,7 @@ name=`echo "$name" | awk '{ print tolower($1) }'`
 pyinstaller main.py -F  -n "pylastic-${name}-${ver}" \
 --onefile --noconfirm \
 --log-level=INFO \
---add-data=README.md:. \
+--add-data="README.md:." \
 --hidden-import=elasticsearch \
 --hidden-import=elasticsearch_dsl \
 --hidden-import=pandas \
