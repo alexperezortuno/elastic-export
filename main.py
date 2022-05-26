@@ -1,6 +1,5 @@
 import ast
 import sys, getopt
-import pandas._libs.tslibs.base
 
 from elasticsearch import Elasticsearch
 from core.log import logger
