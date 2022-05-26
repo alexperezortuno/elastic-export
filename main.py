@@ -32,7 +32,7 @@ if __name__ == "__main__":
         elastic_port: int = ELASTIC_PORT
         elastic_index: str = ELASTIC_INDEX
 
-        print(f"{params.__dict__}")
+        logger.debug(f"[MAIN] {params.__dict__}")
         opts, args = getopt.getopt(sys.argv[1:],
                                    "h:u:p:i:g:l:qs:q:t:o:f:s:op:c:show:r:ms:mc:",
                                    ["help=",
