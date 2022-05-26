@@ -4,7 +4,15 @@ name=$(grep '^NAME' /etc/os-release | awk -F'=' ' gsub(/"/,"") { print $2}')
 name=${name//" "/"-"}
 name=`echo "$name" | awk '{ print tolower($1) }'`
 
-pyinstaller main.py -F  -n "pylastic-${name}-${ver}" \
+filename="pylastic-${name}-${ver}"
+
+if [ ! -f "${filename}.spec" ]
+then
+  pyi-makespec --onefile main.py -n $filename
+fi
+
+
+pyinstaller "${filename}.spec" \
 --onefile --noconfirm \
 --log-level=INFO \
 --add-data="README.md:." \
