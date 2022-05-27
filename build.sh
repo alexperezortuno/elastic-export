@@ -12,7 +12,7 @@ then
 fi
 
 
-pyinstaller -F -w "${filename}.spec" \
+pyinstaller main.py -F -n "${filename}.spec" \
 --onefile --noconfirm \
 --log-level=INFO \
 --add-data="README.md:." \
@@ -25,5 +25,4 @@ pyinstaller -F -w "${filename}.spec" \
 --hidden-import="pandas._libs.skiplist" \
 --hidden-import="numpy" \
 --hidden-import="coloredlogs" \
-main.py \
 --clean
