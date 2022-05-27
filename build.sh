@@ -12,13 +12,18 @@ then
 fi
 
 
-pyinstaller "${filename}.spec" \
+pyinstaller -F -w "${filename}.spec" \
 --onefile --noconfirm \
 --log-level=INFO \
 --add-data="README.md:." \
---hidden-import=elasticsearch \
---hidden-import=elasticsearch_dsl \
---hidden-import=pandas \
---hidden-import=numpy \
---hidden-import=coloredlogs \
+--hidden-import="elasticsearch" \
+--hidden-import="elasticsearch_dsl" \
+--hidden-import="pandas" \
+--hidden-import="pandas._libs.tslibs.base" \
+--hidden-import="pandas._libs.tslibs.np_datetime" \
+--hidden-import="pandas._libs.tslibs.nattype" \
+--hidden-import="pandas._libs.skiplist" \
+--hidden-import="numpy" \
+--hidden-import="coloredlogs" \
+main.py \
 --clean
