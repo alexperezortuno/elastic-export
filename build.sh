@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/usr/src/env bash
 ver=$(grep '^VERSION_ID' /etc/os-release | awk -F'=' ' gsub(/"/,"") { print $2}')
 name=$(grep '^NAME' /etc/os-release | awk -F'=' ' gsub(/"/,"") { print $2}')
 name=${name//" "/"-"}
