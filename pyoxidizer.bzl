@@ -5,6 +5,9 @@
 
 PYTHON_VERSION = VARS.get("PYTHON_VERSION","3.8")
 
+def make_dist():
+    return default_python_distribution(python_version=PYTHON_VERSION)
+
 # Configuration files consist of functions which define build "targets."
 # This function creates a Python executable and installs it in a destination
 # directory.
